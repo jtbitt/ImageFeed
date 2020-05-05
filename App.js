@@ -2,14 +2,23 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Constants from 'expo-constants';
 
-import Avatar from './components/Avatar';
+import Card from './components/Card';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Avatar initials={'JB'} size={35} backgroundColor={'teal'} />
-    </View>
-  );
+export default class App extends React.Component {
+  render() {
+    return(
+      <View style={styles.container}>
+        <Card
+          fullname={'Jay Bittner'}
+          linkText={'Comments'}
+          onPressLinkText={() => {
+            console.log('Pressed link!');
+          }}
+          image={{ uri: 'https://unsplash.it/600/600' }}
+        />
+      </View>
+    );
+  };
 }
 
 const styles = StyleSheet.create({

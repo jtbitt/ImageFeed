@@ -41,7 +41,7 @@ AuthorRow.propTypes = {
 	onPressLinkText: PropTypes.func.isRequired,
 };
 
-const Styles = StyleSheet.create({
+const styles = StyleSheet.create({
 	container: {
 		height: 50,
 		flexDirection: 'row',
