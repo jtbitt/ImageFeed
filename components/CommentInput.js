@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 export default class CommentInput extends React.Component {
-	static PropTypes = {
+	static propTypes = {
 		onSubmit: PropTypes.func.isRequired,
 		placeholder: PropTypes.string,
 	};

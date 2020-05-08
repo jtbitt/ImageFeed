@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 export default class CommentList extends React.Component {
-	static PropTypes = {
+	static propTypes = {
 		items: PropTypes.arrayOf(PropTypes.string).isRequired,
 	};
 

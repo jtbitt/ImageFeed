@@ -1,8 +1,9 @@
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Modal, Platform, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
 
 import Feed from './screens/Feed';
+import Comments from './screens/Comments';
 
 export default class App extends React.Component {
   state = {
@@ -10,6 +11,18 @@ export default class App extends React.Component {
     showModal: false,
     selectedItemId: null,
   };
+
+  onSubmitComment = (text) => {
+    const { selectedItemId, commentsForItem } = this.state;
+    const comments = commentsForItem[selectedItemId] || [];
+
+    const updated = {
+      ...commentsForItem,
+      [selectedItemId]: [...comments, text],
+    };
+
+    this.setState({ commentsforItem: updated });
+  }
 
   openCommentScreen = id => {
     this.setState({
@@ -26,12 +39,30 @@ export default class App extends React.Component {
   };
 
   render() {
-    return(
+    const { commentsForItem, showModal, selectedItemId } = this.state;
+
+    return (
       <View style={styles.container}>
-        <Feed style={styles.feed} />
+        <Feed 
+          style={styles.feed}
+          commentsForItem={commentsForItem}
+          onPressComments={this.openCommentScreen}
+        />
+        <Modal
+          visible={showModal}
+          animationType="slide"
+          onRequestClose={this.closeCommentScreen}
+        >
+          <Comments
+            styles={styles.container}
+            comments={commentsForItem[selectedItemId] || []}
+            onClose={this.closeCommentScreen}
+            onSubmitComment={this.onSubmitComment}
+          />
+        </Modal>
       </View>
     );
-  };
+  }
 }
 
 const platformVersion =
@@ -48,6 +79,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 
       Platform.OS === 'android' || platformVersion < 11
+        ? Constants.statusBarHeight
+        : 0,
+  },
+  comments: {
+    flex: 1,
+    marginTop: 
+      Platform.OS === 'ios' && platformVersion < 11
         ? Constants.statusBarHeight
         : 0,
   },

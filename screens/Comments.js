@@ -10,7 +10,7 @@ export default function Comments({
 	style,
 	comments,
 	onClose,
-	onSubmitComponent,
+	onSubmitComment,
 }) {
 	return (
 		<SafeAreaView style={style}>
