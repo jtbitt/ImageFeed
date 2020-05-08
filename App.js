@@ -1,9 +1,17 @@
-import React from 'react';
-import { Modal, Platform, StyleSheet, View } from 'react-native';
+import {
+  AsyncStorage,
+  Modal,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
 import Constants from 'expo-constants';
+import React from 'react';
 
-import Feed from './screens/Feed';
 import Comments from './screens/Comments';
+import Feed from './screens/Feed';
+
+const ASYNC_STORAGE_COMMENTS_KEY = 'ASYNC_STORAGE_COMMENTS_KEY';
 
 export default class App extends React.Component {
   state = {
@@ -12,7 +20,23 @@ export default class App extends React.Component {
     selectedItemId: null,
   };
 
-  onSubmitComment = (text) => {
+  async componentDidMount() {
+    try {
+      const commentsForItem = await AsyncStorage.getItem(
+        ASYNC_STORAGE_COMMENTS_KEY,
+      );
+
+      this.setState({
+        commentsForItem: commentsForItem
+          ? JSON.parse(commentsForItem)
+          : {},
+      });
+    } catch (e) {
+      console.log('Failed to load comments');
+    }
+  }
+
+  onSubmitComment = async text => {
     const { selectedItemId, commentsForItem } = this.state;
     const comments = commentsForItem[selectedItemId] || [];
 
@@ -21,8 +45,22 @@ export default class App extends React.Component {
       [selectedItemId]: [...comments, text],
     };
 
-    this.setState({ commentsforItem: updated });
-  }
+    this.setState({ commentsForItem: updated });
+
+    try {
+      await AsyncStorage.setItem(
+        ASYNC_STORAGE_COMMENTS_KEY,
+        JSON.stringify(updated),
+      );
+    } catch (e) {
+      console.log(
+        'Failed to save comment',
+        text,
+        'for',
+        selectedItemId,
+      );
+    }
+  };
 
   openCommentScreen = id => {
     this.setState({
@@ -43,7 +81,7 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container}>
-        <Feed 
+        <Feed
           style={styles.feed}
           commentsForItem={commentsForItem}
           onPressComments={this.openCommentScreen}
@@ -54,7 +92,7 @@ export default class App extends React.Component {
           onRequestClose={this.closeCommentScreen}
         >
           <Comments
-            styles={styles.container}
+            style={styles.comments}
             comments={commentsForItem[selectedItemId] || []}
             onClose={this.closeCommentScreen}
             onSubmitComment={this.onSubmitComment}
@@ -77,14 +115,14 @@ const styles = StyleSheet.create({
   },
   feed: {
     flex: 1,
-    marginTop: 
+    marginTop:
       Platform.OS === 'android' || platformVersion < 11
         ? Constants.statusBarHeight
         : 0,
   },
   comments: {
     flex: 1,
-    marginTop: 
+    marginTop:
       Platform.OS === 'ios' && platformVersion < 11
         ? Constants.statusBarHeight
         : 0,
